@@ -1,0 +1,24 @@
+version: "3.8"
+services:
+  loader:
+    build: .
+    image: mt5-orderbook-loader:latest
+    environment:
+      SYMBOL: ${SYMBOL}
+      TIMEZONE: ${TIMEZONE}
+      INFLUX_URL: ${INFLUX_URL}
+      INFLUX_TOKEN: ${INFLUX_TOKEN}
+      INFLUX_ORG: ${INFLUX_ORG}
+      INFLUX_BUCKET: ${INFLUX_BUCKET}
+      POLL_INTERVAL_MS: ${POLL_INTERVAL_MS}
+      WRITE_BATCH_SIZE: ${WRITE_BATCH_SIZE}
+      WRITE_FLUSH_INTERVAL_MS: ${WRITE_FLUSH_INTERVAL_MS}
+      MT5_TERMINAL_PATH: ${MT5_TERMINAL_PATH}
+      MT5_LOGIN: ${MT5_LOGIN}
+      MT5_PASSWORD: ${MT5_PASSWORD}
+      MT5_SERVER: ${MT5_SERVER}
+    env_file:
+      - .env
+    isolation: process
+    platform: windows/amd64
+    restart: unless-stopped
