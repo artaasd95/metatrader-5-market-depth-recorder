@@ -56,13 +56,28 @@ def main():
     if not bucket:
         bucket = f"orderbook_{symbol}"
 
-    if not mt5.initialize(path=mt5_path):
-        print(f"MetaTrader5 initialize failed: {mt5.last_error()}")
-        sys.exit(1)
+    # Initialize MT5 - use path if provided, otherwise use default initialization
+    if mt5_path:
+        print(f"Initializing MT5 with terminal path: {mt5_path}")
+        if not mt5.initialize(path=mt5_path):
+            print(f"MetaTrader5 initialize with path failed: {mt5.last_error()}")
+            sys.exit(1)
+    else:
+        print("Initializing MT5 with default path (no MT5_TERMINAL_PATH provided)")
+        if not mt5.initialize():
+            print(f"MetaTrader5 initialize failed: {mt5.last_error()}")
+            sys.exit(1)
+    
+    # Only attempt login if all credentials are provided
     if login and password and server:
+        print(f"Attempting login with credentials for server: {server}")
         if not mt5.login(int(login), password=password, server=server):
             print(f"MetaTrader5 login failed: {mt5.last_error()}")
-            sys.exit(1)
+            print("Continuing with default initialization (assuming MT5 is already logged in)")
+    else:
+        print("No MT5 credentials provided - using default initialization")
+        print("Ensure MetaTrader 5 is already running and logged in")
+    
     if not mt5.market_book_add(symbol):
         print(f"Market book add failed: {mt5.last_error()}")
         sys.exit(1)
