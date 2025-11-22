@@ -7,7 +7,7 @@ Thank you for considering contributing to this project! Here are some guidelines
 1. **Fork the repository** on GitHub
 2. **Clone your fork** locally:
    ```bash
-   git clone https://github.com/your-username/metatrader-5-market-depth-recorder.git
+   git clone https://github.com/artaasd95/metatrader-5-market-depth-recorder.git
    cd metatrader-5-market-depth-recorder
    ```
 
