@@ -1,12 +1,32 @@
 version: "3.8"
 services:
-  loader:
+  # InfluxDB service - runs in Docker
+  influxdb:
+    image: influxdb:2.7
+    container_name: mt5-influxdb
+    ports:
+      - "8086:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=admin123
+      - DOCKER_INFLUXDB_INIT_ORG=mt5-org
+      - DOCKER_INFLUXDB_INIT_BUCKET=orderbook_data
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=your-super-secret-token
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+    restart: unless-stopped
+
+  # MT5 Loader service - runs natively on Windows host
+  # This service definition is for documentation purposes only
+  # The actual loader should be run directly on Windows
+  mt5-loader:
     build: .
     image: mt5-orderbook-loader:latest
     environment:
       SYMBOL: ${SYMBOL}
       TIMEZONE: ${TIMEZONE}
-      INFLUX_URL: ${INFLUX_URL}
+      INFLUX_URL: http://host.docker.internal:8086
       INFLUX_TOKEN: ${INFLUX_TOKEN}
       INFLUX_ORG: ${INFLUX_ORG}
       INFLUX_BUCKET: ${INFLUX_BUCKET}
@@ -19,6 +39,9 @@ services:
       MT5_SERVER: ${MT5_SERVER}
     env_file:
       - .env
-    isolation: process
-    platform: windows/amd64
-    restart: unless-stopped
+    # Note: This service cannot run in Docker due to MT5 requirements
+    # Use the run-windows.ps1 script instead
+    profiles: ["do-not-use"]
+
+volumes:
+  influxdb_data:
