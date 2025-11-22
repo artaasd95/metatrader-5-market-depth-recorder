@@ -6,13 +6,15 @@ services:
     container_name: mt5-influxdb
     ports:
       - "8086:8086"
+    env_file:
+      - .env
     environment:
       - DOCKER_INFLUXDB_INIT_MODE=setup
       - DOCKER_INFLUXDB_INIT_USERNAME=admin
       - DOCKER_INFLUXDB_INIT_PASSWORD=admin123
       - DOCKER_INFLUXDB_INIT_ORG=mt5-org
-      - DOCKER_INFLUXDB_INIT_BUCKET=orderbook_data
-      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=your-super-secret-token
+      - DOCKER_INFLUXDB_INIT_BUCKET=orderbook_data_${SYMBOL:-EURUSD}
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUX_TOKEN:-your-influxdb-admin-token-here}
     volumes:
       - influxdb_data:/var/lib/influxdb2
     restart: unless-stopped
@@ -20,28 +22,28 @@ services:
   # MT5 Loader service - runs natively on Windows host
   # This service definition is for documentation purposes only
   # The actual loader should be run directly on Windows
-  mt5-loader:
-    build: .
-    image: mt5-orderbook-loader:latest
-    environment:
-      SYMBOL: ${SYMBOL}
-      TIMEZONE: ${TIMEZONE}
-      INFLUX_URL: http://host.docker.internal:8086
-      INFLUX_TOKEN: ${INFLUX_TOKEN}
-      INFLUX_ORG: ${INFLUX_ORG}
-      INFLUX_BUCKET: ${INFLUX_BUCKET}
-      POLL_INTERVAL_MS: ${POLL_INTERVAL_MS}
-      WRITE_BATCH_SIZE: ${WRITE_BATCH_SIZE}
-      WRITE_FLUSH_INTERVAL_MS: ${WRITE_FLUSH_INTERVAL_MS}
-      MT5_TERMINAL_PATH: ${MT5_TERMINAL_PATH}
-      MT5_LOGIN: ${MT5_LOGIN}
-      MT5_PASSWORD: ${MT5_PASSWORD}
-      MT5_SERVER: ${MT5_SERVER}
-    env_file:
-      - .env
-    # Note: This service cannot run in Docker due to MT5 requirements
-    # Use the run-windows.ps1 script instead
-    profiles: ["do-not-use"]
+  # mt5-loader:
+  #   build: .
+  #   image: mt5-orderbook-loader:latest
+  #   environment:
+  #     SYMBOL: ${SYMBOL}
+  #     TIMEZONE: ${TIMEZONE}
+  #     INFLUX_URL: http://host.docker.internal:8086
+  #     INFLUX_TOKEN: ${INFLUX_TOKEN}
+  #     INFLUX_ORG: ${INFLUX_ORG}
+  #     INFLUX_BUCKET: ${INFLUX_BUCKET}
+  #     POLL_INTERVAL_MS: ${POLL_INTERVAL_MS}
+  #     WRITE_BATCH_SIZE: ${WRITE_BATCH_SIZE}
+  #     WRITE_FLUSH_INTERVAL_MS: ${WRITE_FLUSH_INTERVAL_MS}
+  #     MT5_TERMINAL_PATH: ${MT5_TERMINAL_PATH}
+  #     MT5_LOGIN: ${MT5_LOGIN}
+  #     MT5_PASSWORD: ${MT5_PASSWORD}
+  #     MT5_SERVER: ${MT5_SERVER}
+  #   env_file:
+  #     - .env
+  #   # Note: This service cannot run in Docker due to MT5 requirements
+  #   # Use the run-windows.ps1 script instead
+  #   profiles: ["do-not-use"]
 
 volumes:
   influxdb_data:

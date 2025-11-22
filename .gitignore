@@ -64,6 +64,7 @@ docs-tex/_29330223E96B4290E236A247AEC153FD.data.minted
 refs/
 base-codes/
 *.env
-.env
+
 
 myenv/
+.env
