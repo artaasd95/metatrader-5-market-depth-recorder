@@ -65,3 +65,5 @@ refs/
 base-codes/
 *.env
 .env
+
+myenv/
