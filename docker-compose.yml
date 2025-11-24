@@ -1,23 +1,19 @@
 version: "3.8"
 services:
-  # InfluxDB service - runs in Docker
-  influxdb:
-    image: influxdb:2.7
-    container_name: mt5-influxdb
+  # TimescaleDB service - runs in Docker
+  timescaledb:
+    image: timescale/timescaledb:latest-pg17
+    container_name: mt5-timescaledb
     ports:
-      - "8086:8086"
-    env_file:
-      - .env
+      - "25432:5432"
     environment:
-      - DOCKER_INFLUXDB_INIT_MODE=setup
-      - DOCKER_INFLUXDB_INIT_USERNAME=admin
-      - DOCKER_INFLUXDB_INIT_PASSWORD=admin123
-      - DOCKER_INFLUXDB_INIT_ORG=mt5-org
-      - DOCKER_INFLUXDB_INIT_BUCKET=orderbook_data_${SYMBOL:-EURUSD}
-      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUX_TOKEN:-your-influxdb-admin-token-here}
+      - POSTGRES_DB=mt5_orderbook
+      - POSTGRES_USER=mt5_user
+      - POSTGRES_PASSWORD=mt5_password
     volumes:
-      - influxdb_data:/var/lib/influxdb2
+      - timescaledb_data:/var/lib/postgresql/data
     restart: unless-stopped
+    command: ["postgres", "-c", "shared_preload_libraries=timescaledb"]
 
   # MT5 Loader service - runs natively on Windows host
   # This service definition is for documentation purposes only
@@ -46,4 +42,4 @@ services:
   #   profiles: ["do-not-use"]
 
 volumes:
-  influxdb_data:
+  timescaledb_data:
